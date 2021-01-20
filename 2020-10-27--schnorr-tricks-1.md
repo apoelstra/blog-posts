@@ -165,10 +165,13 @@ closer to covenants. Indeed, all we need is `CAT` to get `CAT`+`CHECKSIGFROMSTAC
 covenants.
 
 However, there is a problem if we hope to do construct recursive covenants, which dynamically
-restricting transaction output scripts: in Taproot, transaction outputs are EC public
-keys, which commit to scripts using an elliptic-curvy hash we don't have in Script. Or do
-we? I believe the answer is no, but I also believe that we can do some very interesting
-things with this.
+restrict transaction output scripts to follow certain tempates. In Taproot, transaction
+outputs are EC public
+keys, which commit to scripts using an elliptic-curvy hash we don't have in Script. ...Or do
+we?
+
+I believe the answer is no, but I also believe that we can do some very interesting
+things with this nonetheless.
 
 A natural question to ask is, are these sighash-templating covenants powerful enough to
 actually do anything, given the consensus limits of Script? Readers may recall that we
