@@ -176,7 +176,7 @@ things with this nonetheless.
 A natural question to ask is, are these sighash-templating covenants powerful enough to
 actually do anything, given the consensus limits of Script? Readers may recall that we
 [blogged at Blockstream four years ago](https://blockstream.com/2016/11/02/en-covenants-in-elements-alpha/)
-about this but never followed up with practical applications. My believe is that the
+about this but never followed up with practical applications. My belief now is that the
 dearth of applications was more a consequence of the incredible difficulty of reasoning
 about and constructing Script, and that [Miniscript](http://bitcoin.sipa.be/miniscript/)
 has since provided some new ways of thinking that will accellerate this kind of development.
