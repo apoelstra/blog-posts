@@ -53,7 +53,7 @@ It is straightforward to generalize this to a choice of a small number of transa
 but open-ended predicates like "any transaction whose outputs are less than 1 BTC" are
 out of the question.
 
-It turns out this sort of covenant can't work, for a technical reason: the of the
+It turns out this sort of covenant can't work, for a technical reason: the
 transaction data that `CHECKSIG` checks always includes the txid of the previous
 transaction, which is a hash of (among other things) the covenant script itself.
 (This isn't quite true because of the `SIGHASH_SINGLE` bug but for our purposes this
