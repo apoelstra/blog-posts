@@ -1,4 +1,4 @@
-Title: `OP_CAT` and Schnorr Tricks: Part 1
+Title: CAT and Schnorr Tricks I
 Date: 2021-01-20 19:00
 Category: Programming Languages
 
