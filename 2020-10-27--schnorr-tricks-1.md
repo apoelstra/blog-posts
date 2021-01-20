@@ -1,5 +1,5 @@
 Title: `OP_CAT` and Schnorr Tricks: Part 1
-Date: 2020-10-28 23:13
+Date: 2021-01-20 19:00
 Category: Programming Languages
 
 # Introduction
@@ -164,22 +164,27 @@ to be more "covenant-proof" than the old-school ECDSA signatures, actually leave
 closer to covenants. Indeed, all we need is `CAT` to get `CAT`+`CHECKSIGFROMSTACK`-style
 covenants.
 
-However, there is a problem if we hope to do anything interesting with these covenants,
-as far as restricting transaction outputs: in Taproot, transaction outputs are EC public
-keys, which commit to scripts using an elliptic-curvy hash we don't have in Script. Or
-do we? In the next post we find out that the answer is yes.
+However, there is a problem if we hope to do construct recursive covenants, which dynamically
+restricting transaction output scripts: in Taproot, transaction outputs are EC public
+keys, which commit to scripts using an elliptic-curvy hash we don't have in Script. Or do
+we? I believe the answer is no, but I also believe that we can do some very interesting
+things with this.
 
-After that, a natural question to ask is, are these covenants powerful enough to actually
-do anything? Readers may recall that we [blogged at Blockstream four years ago
-](https://blockstream.com/2016/11/02/en-covenants-in-elements-alpha/)
-about this but never followed up with practical applications. (Though for those willing
-to really dig into Scipt, [such applications do exist](https://ruggedbytes.com/articles/ll/).)
-In our third post, we'll talk about how Taproot relaxes some of the Script limitations
-that historically caused us problems for covenants, and about some complexity's with
-covenants on Elements that aren't problems in Bitcoin.
+A natural question to ask is, are these sighash-templating covenants powerful enough to
+actually do anything, given the consensus limits of Script? Readers may recall that we
+[blogged at Blockstream four years ago](https://blockstream.com/2016/11/02/en-covenants-in-elements-alpha/)
+about this but never followed up with practical applications. My believe is that the
+dearth of applications was more a consequence of the incredible difficulty of reasoning
+about and constructing Script, and that [Miniscript](http://bitcoin.sipa.be/miniscript/)
+has since provided some new ways of thinking that will accellerate this kind of development.
+And indeed, if you really want to dig into Script, [you can construct some pretty cool
+things with `CHECKSIGFROMSTACK`](https://ruggedbytes.com/articles/ll/).
 
-In our final post we'll put these ideas together and demonstrate some actual applications
-of these things.
+In our next posts, we'll talk about how to use auxiliary inputs to simulate `SIGHASH_NOINPUT`
+and enable constant-sized backups for Lightning channels, and how to use "value-switching"
+to construct Vaults.
 
+In our final post we'll talk about ad-hoc extensions of Miniscript, and how to develop
+software for these constructions in a maintainable way.
 
 
