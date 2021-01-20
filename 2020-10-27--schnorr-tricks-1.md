@@ -116,7 +116,7 @@ hash, but since $P$ itself was supposed to be the hash, we had a circularity and
 
 It would appear that BIP340 puts the nail in the coffin of this style of covenant: $P$ shows
 up explicitly in the signature hash, so no matter what crazy future sighashing schemes might
-get including in Bitcoin, this circularity will remain and we are stuck. In fact, this inclusion
+get included in Bitcoin, this circularity will remain and we are stuck. In fact, this inclusion
 of $P$ means that BIP340 signatures aren't just signatures, but "signatures of knowledge". This
 is a term of art which means, roughly, that you are not able to run these signatures backward
 in any sense. For a long time, I thought this meant that I couldn't abuse BIP340 signatures to
@@ -153,7 +153,7 @@ In fact this +1 is super easy to deal with. We just require the user grind her t
 data until the actual hash ends in the byte `01`, which is pretty cheap (takes 256 tries
 on average, which at 250ns per shot would take 64 microseconds, comparable to the signing
 algorithm itself). Then her `s` value will end it 2, which we enforce by asking her to
-leave it off; we'll add it ourself. Concretely we add a `2 CAT` after the `2DUP` in our
+leave it off; we'll add it ourselves. Concretely we add a `2 CAT` after the `2DUP` in our
 script, where we're computing $s$ for the signature check, and `1 CAT` to the end of our
 script where we want the result to be our transaction hash. Voilà.
 
