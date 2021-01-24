@@ -28,7 +28,7 @@ result onto the stack. It can be used to assemble large stack items from
 small ones, or to split large items into smaller ones. `CHECKSIGFROMSTACK`,
 which has never been in Bitcoin, is an opcode which allows the user to
 check signatures on arbitrary data, unlike the `CHECKSIG` opcode which checks
-a signature on the spending transaaction.
+a signature on the spending transaction.
 
 The combination of `CAT` and `CHECKSIGFROMSTACK` gives you transaction introspection
 in a somewhat clever way: the user provides data for the entire transaction on the
@@ -165,7 +165,7 @@ closer to covenants. Indeed, all we need is `CAT` to get `CAT`+`CHECKSIGFROMSTAC
 covenants.
 
 However, there is a problem if we hope to do construct recursive covenants, which dynamically
-restrict transaction output scripts to follow certain tempates. In Taproot, transaction
+restrict transaction output scripts to follow certain templates. In Taproot, transaction
 outputs are EC public
 keys, which commit to scripts using an elliptic-curvy hash we don't have in Script. ...Or do
 we?
@@ -179,7 +179,7 @@ actually do anything, given the consensus limits of Script? Readers may recall t
 about this but never followed up with practical applications. My belief now is that the
 dearth of applications was more a consequence of the incredible difficulty of reasoning
 about and constructing Script, and that [Miniscript](http://bitcoin.sipa.be/miniscript/)
-has since provided some new ways of thinking that will accellerate this kind of development.
+has since provided some new ways of thinking that will accelerate this kind of development.
 And indeed, if you really want to dig into Script, [you can construct some pretty cool
 things with `CHECKSIGFROMSTACK`](https://ruggedbytes.com/articles/ll/).
 
