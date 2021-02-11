@@ -2,6 +2,8 @@ Title: CAT and Schnorr Tricks I
 Date: 2021-01-20 19:00
 Category: Programming Languages
 
+[Part 2](https://www.wpsoftware.net/andrew/blog/cat-and-schnorr-tricks-ii.html)
+
 # Introduction
  
 This is the first in a series of posts about about covenants in Bitcoin
@@ -70,7 +72,7 @@ Network world, Bitcoin would have covenants. Let's see how this works:
 ECDSA signatures work as follows: you have a keypair $(x, P = xG)$ which are your signing
 and verification keys, respectively. If you're not familiar with the mapping $x\mapsto xG$,
 it maps scalars (integers modulo some large prime) to elliptic curve points (pairs of
-integers modulo some different prime, which satisfy some particular equaton). What's
+integers modulo some different prime, which satisfy some particular equation). What's
 important is (a) it's homomorphic, so $(x + y)G = xG + yG$, and (b) it's believed to be
 impossible to reverse without a quantum computer. Aside from these two facts it's not
 important what this mapping looks like on an algorithmic level; we'll just treat it as a
