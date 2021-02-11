@@ -130,14 +130,17 @@ and `P` to get a transaction hash out of `s`. And in fact, the resulting transac
 a "real" hash, in the sense that there aren't any un-Script-able elliptic curve ops involved
 in it.
 
-Let's be specific: consider the script `2DUP CAT ROT DUP <G> EQUALVERIFY CHECKSIG`. This
+Let's be specific: consider the script `<G> 2DUP SWAP CAT SWAP CHECKSIG`. This
 
-* takes as input a signature in two pieces, so our stack is `R s`;
-* `2DUP CAT` duplicates both pieces and concatenates the copy, leaving the stack as `R s Rs`
-* `ROT DUP` moves the `R` to the top of the stack and duplicates, leaving `s Rs R R`
-* `<G> EQUALVERIFY` consumes the top `R` and forces all of them to be the EC group generator $G$
-* `CHECKSIG` interprets the remaining `R` as a public key, which it verifies the signature `Rs` with, consuming both
+* takes as input the `s` value of the signature, so our stack is simply `s`;
+* `<G> 2DUP` adds a fixed `R` value and duplicates both parts, leaving `s <G> s <G>`
+* `SWAP CAT` swaps one copy and concatenates to produce a full signature, leaving the stack as `s <G> <G>s`
+* `SWAP` moves the other `<G>` in place to act as a pubkey, so the stack is `s <G>s <G>`
+* `CHECKSIG` interprets the top `<G>` as a public key, which it verifies the signature `<G>s` with, consuming both
 * Now only `s` is on the stack.
+
+(Thanks to Dmitry Petukhov for this script, which is smaller than the original one
+that I had proposed.)
 
 Yikes. What is going on here? Well, the step where we force both $R$ and $P$ to be the
 group generator is equivalent to forcing our secret keys $x$ and $k$ to be 1. Our BIP340
