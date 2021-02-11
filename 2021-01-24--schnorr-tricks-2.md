@@ -11,9 +11,7 @@ using [Taproot](https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki)
 and a (hypothetical) `CAT` opcode. Historically, and as has
 been implemented in [Elements](https://github.com/ElementsProject/elements/),
 `CAT` has been considered to be a covenant opcode only in conjunction with
-`CHECKSIGFROMSTACK`. In this post, which will be much mathier than later ones,
-we'll talk about how to abuse the math of Schnorr signatures to emulate the
-functionality of `CHECKSIGFROMSTACK`.
+`CHECKSIGFROMSTACK`.
 
 In our last post we introduced the idea of using `CAT` and fixed Schnorr
 signatures to create covenants, by allowing a Script writer to reconstruct a
