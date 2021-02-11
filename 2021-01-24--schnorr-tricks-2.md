@@ -74,7 +74,7 @@ want them.
 He later [issued a challenge on Twitter](https://twitter.com/Ethan_Heilman/status/1194624166093369345)
 for anyone to come up with a technically feasible dark covenant, using any
 opcode that had ever been proposed for Bitcoin, in exchange for a free coffee.
-On Telegram, I and others offered extended Ethan's offer with various alcoholic
+On Telegram, I and others offered to extend Ethan's offer with various alcoholic
 beverages. Incentivized by the free beer I'd promised to buy myself, I spent
 several hours trying to construct such a thing, but to no avail. As of this
 writing, nobody has successfully taken Ethan up on this challenge. 
