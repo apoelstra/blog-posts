@@ -169,7 +169,7 @@ to be more "covenant-proof" than the old-school ECDSA signatures, actually leave
 closer to covenants. Indeed, all we need is `CAT` to get `CAT`+`CHECKSIGFROMSTACK`-style
 covenants.
 
-However, there is a problem if we hope to do construct recursive covenants, which dynamically
+However, there is a problem if we hope to construct recursive covenants, which dynamically
 restrict transaction output scripts to follow certain tempates. In Taproot, transaction
 outputs are EC public
 keys, which commit to scripts using an elliptic-curvy hash we don't have in Script. ...Or do
