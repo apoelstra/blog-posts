@@ -151,6 +151,7 @@ covenant will restrict the first output such that its scriptPubKey will be
 the staging script and its value equal to that of the input.
 
 The second output has no restrictions on it, but serves three purposes:
+
 * Most importantly, our target destination will be defined to have its scriptPubKey
 * It is a change output for the transaction
 * It is an output we can spend to use child-pays-for-parent to feebump the transaction
