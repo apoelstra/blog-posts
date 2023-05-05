@@ -38,12 +38,12 @@ how late an abortion the pills were good for. That's capitalism for you, I guess
 Anyway, since my job does in fact involve making volvelles for cryptography,
 I was able to quickly whip up my own version. The source (in hand-written PostScript)
 is [hosted on Github here](https://github.com/apoelstra/pregnancy-wheel) or
-you can download it in [PostScript]({filename}/images/pregnancy-wheel.ps) or
-[PDF]({filename}/images/pregnancy-wheel.pdf) form here.
+you can download it in [PostScript]({static}/images/pregnancy-wheel.ps) or
+[PDF]({static}/images/pregnancy-wheel.pdf) form here.
 
 In case I update this, the Github source is more likely to be up-to-date.
 
-![Screenshot of printouts]({filename}/images/pregnancy-wheel.png)
+![Screenshot of printouts]({static}/images/pregnancy-wheel.png)
 
 
 
