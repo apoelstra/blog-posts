@@ -43,7 +43,7 @@ you can download it in [PostScript]({static}/images/pregnancy-wheel.ps) or
 
 In case I update this, the Github source is more likely to be up-to-date.
 
-![Screenshot of printouts]({static}/images/pregnancy-wheel.png)
+![Screenshot of printouts]({static}/images/pregnancy-wheel-sm.png)
 
 
 
