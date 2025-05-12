@@ -5,7 +5,7 @@ let
     owner = "slok";
     repo = "iris";
     rev = "34f8c50b92f62e31a5443c43cad422bdea4046e6"; # Dernière révision du dépôt
-    sha256 = "sha256-Ov7YTj9SZ9f5OKvNNZEQiIYMFXxgX+LHNVmRLQJQlQw=";
+    sha256 = "sha256-h+uCYX69q+aidSQJi8hw9/+ESVtgBoRb1+PU6yCYECQ=";
   };
 in
 
