@@ -1,5 +1,14 @@
 { pkgs ? import <nixpkgs> {} }:
 
+let
+  irisTheme = pkgs.fetchFromGitHub {
+    owner = "slok";
+    repo = "iris";
+    rev = "34f8c50b92f62e31a5443c43cad422bdea4046e6"; # Dernière révision du dépôt
+    sha256 = "sha256-Ov7YTj9SZ9f5OKvNNZEQiIYMFXxgX+LHNVmRLQJQlQw=";
+  };
+in
+
 pkgs.stdenv.mkDerivation {
   name = "andrews-blog";
   src = ./.;
@@ -8,15 +17,12 @@ pkgs.stdenv.mkDerivation {
     python3
     python3Packages.pelican
     python3Packages.markdown
-    git
   ];
 
   buildPhase = ''
-    # Créer un répertoire temporaire pour le thème
+    # Utiliser le thème Iris téléchargé via fetchFromGitHub
     mkdir -p iris
-    
-    # Cloner le thème Iris depuis GitHub
-    ${pkgs.git}/bin/git clone https://github.com/slok/iris.git iris
+    cp -r ${irisTheme}/* iris/
     
     # Générer le site avec Pelican
     ${pkgs.python3Packages.pelican}/bin/pelican content -o $out -s pelicanconf.py
@@ -34,4 +40,8 @@ pkgs.stdenv.mkDerivation {
   # Désactiver certaines phases qui ne sont pas nécessaires
   dontFixup = true;
   dontPatchELF = true;
+  
+  # Permettre la substitution pour accélérer les builds
+  preferLocalBuild = false;
+  allowSubstitutes = true;
 }
