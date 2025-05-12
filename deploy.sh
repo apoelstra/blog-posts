@@ -12,7 +12,7 @@ echo -e "${YELLOW}Starting deployment process...${NC}"
 echo -e "${YELLOW}Processing OpenTimestamps files...${NC}"
 unstamped_files=()
 
-for file in $(find content/ -type f -not -name "*.ots" -not -path "*/\.*" -not -path "*/images/*"); do
+find content/ -type f -not -name "*.ots" -not -path "*/\.*" -not -path "*/images/*" | while read -r file; do
     if [ -f "${file}.ots" ]; then
         echo -e "${GREEN}Upgrading ${file}.ots${NC}"
         ots upgrade "${file}.ots" || echo -e "${RED}Upgrade failed for ${file}.ots${NC}"
