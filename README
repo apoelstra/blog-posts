@@ -2,4 +2,13 @@
 
 This repo contains the content for Andrew's blog. It is published using Pelican.
 
+## Utilisation avec Nix
+
+Pour construire le site:
+
+```bash
+nix-build
+```
+
+Le site sera généré dans le répertoire `result/`.
 
