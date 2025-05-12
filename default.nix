@@ -25,10 +25,11 @@ pkgs.stdenv.mkDerivation {
     cp -r ${irisTheme}/* iris/
     chmod +w -R iris/
     find iris -type f -name '*.html' -exec sed -i 's/http:/https:/g' {} \;
-    
+    sed -i 's/height: 165px;//' iris/static/css/main.css
+
     # Generate the site with Pelican
     ${pkgs.python3Packages.pelican}/bin/pelican content -o $out -s pelicanconf.py
-    
+
     # Copy the theme to the output directory
     mkdir -p $out/theme
     cp -r iris/* $out/theme/
@@ -42,7 +43,7 @@ pkgs.stdenv.mkDerivation {
   # Disable phases that are not necessary
   dontFixup = true;
   dontPatchELF = true;
-  
+
   # Allow substitution to speed up builds
   preferLocalBuild = false;
   allowSubstitutes = true;
