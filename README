@@ -12,3 +12,13 @@ nix-build
 
 Le site sera généré dans le répertoire `result/`.
 
+## Déploiement
+
+Pour vérifier les timestamps, construire et déployer le site:
+
+```bash
+./deploy.sh
+```
+
+Ce script vérifie les fichiers OpenTimestamps, construit le site avec nix-build et le déploie sur le serveur configuré.
+
