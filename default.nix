@@ -20,28 +20,28 @@ pkgs.stdenv.mkDerivation {
   ];
 
   buildPhase = ''
-    # Utiliser le thème Iris téléchargé via fetchFromGitHub
+    # Use the Iris theme downloaded via fetchFromGitHub
     mkdir -p iris
     cp -r ${irisTheme}/* iris/
     
-    # Générer le site avec Pelican
+    # Generate the site with Pelican
     ${pkgs.python3Packages.pelican}/bin/pelican content -o $out -s pelicanconf.py
     
-    # Copier le thème dans le répertoire de sortie
+    # Copy the theme to the output directory
     mkdir -p $out/theme
     cp -r iris/* $out/theme/
   '';
 
   installPhase = ''
-    # Rien à faire ici car buildPhase écrit directement dans $out
-    echo "Site généré dans $out"
+    # Nothing to do here as buildPhase writes directly to $out
+    echo "Site generated in $out"
   '';
 
-  # Désactiver certaines phases qui ne sont pas nécessaires
+  # Disable phases that are not necessary
   dontFixup = true;
   dontPatchELF = true;
   
-  # Permettre la substitution pour accélérer les builds
+  # Allow substitution to speed up builds
   preferLocalBuild = false;
   allowSubstitutes = true;
 }

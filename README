@@ -2,23 +2,23 @@
 
 This repo contains the content for Andrew's blog. It is published using Pelican.
 
-## Utilisation avec Nix
+## Using with Nix
 
-Pour construire le site:
+To build the site:
 
 ```bash
 nix-build
 ```
 
-Le site sera généré dans le répertoire `result/`.
+The site will be generated in the `result/` directory.
 
-## Déploiement
+## Deployment
 
-Pour vérifier les timestamps, construire et déployer le site:
+To verify timestamps, build and deploy the site:
 
 ```bash
 ./deploy.sh
 ```
 
-Ce script vérifie les fichiers OpenTimestamps, construit le site avec nix-build et le déploie sur le serveur configuré.
+This script verifies OpenTimestamps files, builds the site with nix-build and deploys it to the configured server.
 
