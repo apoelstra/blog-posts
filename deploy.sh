@@ -12,7 +12,7 @@ echo -e "${YELLOW}Starting deployment process...${NC}"
 echo -e "${YELLOW}Processing OpenTimestamps files...${NC}"
 unstamped_files=()
 
-find content/ -type f -not -name "*.ots" -not -path "*/\.*" -not -path "*/images/*" | while read -r file; do
+while IFS= read -r file; do
     if [ -f "${file}.ots" ]; then
         echo -e "${GREEN}Upgrading ${file}.ots${NC}"
         ots upgrade "${file}.ots" || echo -e "${RED}Upgrade failed for ${file}.ots${NC}"
@@ -20,7 +20,7 @@ find content/ -type f -not -name "*.ots" -not -path "*/\.*" -not -path "*/images
         echo -e "${YELLOW}Adding ${file} to unstamped files list${NC}"
         unstamped_files+=("${file}")
     fi
-done
+done < <(find content/ -type f -not -name "*.ots" -not -path "*/\.*" -not -path "*/images/*")
 
 # Stamp all unstamped files
 if [ ${#unstamped_files[@]} -gt 0 ]; then
