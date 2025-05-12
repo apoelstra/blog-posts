@@ -40,7 +40,7 @@ echo -e "${GREEN}Build completed successfully${NC}"
 
 # (c) Sync to remote server
 echo -e "${YELLOW}Syncing to remote server...${NC}"
-rsync -avz --delete result/ root@192.168.162.128:/store/www/www/root/andrew/blog2/ || { 
+rsync -avz --delete result/ root@192.168.162.128:/store/www/www/root/andrew/blog/ || { 
     echo -e "${RED}Failed to sync to remote server${NC}"
     exit 1
 }
