@@ -1,0 +1,302 @@
+Title: Jujutsu and GIt
+Date: 2025-05-12 20:40
+Category: Programming,Git,Jujutsu,Source Control
+
+I recently switched from using git to write code to using jujutsu (nearly) exclusively.
+When reviewing, I'll probably stick with git for the forseeable future, because there
+isn't much benefit and the git tooling for viewing commits more familiar and complete.
+
+In this post I'll explain how I was using git and how I switched.
+
+# What is jujutsu?
+
+First, what is jujutsu? It is a git-compatible (meaning: it will work in a git repo
+and manipulate git commits, although it aspires to support an independent mode) source
+control system with a more consistent user interface and a much stronger focus on not
+losing work.
+
+(If, upon reading the above, you felt a need to compulsively comment along the
+lines of "it's super hard to lose work with git", you are wrong. Aside from the
+"usual" ways of clobbering uncommitted changes, with git checkout, reset, stash
+pop, etc., git has primitive facilities for tracking the history of refs and
+nothing at all that tracks the history of worktrees, which makes it basically
+impossible to synchronize two copies of the same repo if both are actively being
+used.)
+
+The way it works is that jujutsu is essentially constantly amending the corrent
+commit with the state of your repository's files. There is an extension where it
+uses fnotify or something to actually do this on every change, but by default
+it just re-commits whenever you interact with it, for example via `jj status`
+or `jj log`.
+
+It's then on you to remember to split off new commits with `jj new` before making
+a new change. Otherwise you may accidentally modify a commit, forcing you to back
+it out with `jj undo`/`jj op restore` or to split up the commit interactively with
+`jj split`.
+
+Where it gets cool is that jujutsu doesn't require or expect that the currently-active
+commit be the tip of its branch. You can just leave your repo sitting at some arbitrary
+commit, edit your files, and it will automatically rebase all of its descendants. If
+there are conflicts in one of those commits, it will mark that commit as conflicted
+and you can fix it at your leisure.
+
+In other words, with jujutsu you are permanently in a `git rebase -i`-like state.
+
+You can read more on [its Github repo](https://github.com/jj-vcs/jj) or in
+[Steve Klabnik's tutorial](https://steveklabnik.github.io/jujutsu-tutorial/).
+
+# My git workflow
+
+When creating new changes, I am typically permanently in a `git rebase -i` state.
+For example, when creating a new PR on Github, I start by creating a new feature
+branch in a fresh worktree:
+
+```
+git worktree add ../2025-05--new-feature
+cd ../2025-05--new-feature
+# make changes, commit, repeat
+```
+
+In that directory, I then start cutting code. If I start doing something and realize
+that I need some supporting change, I commit my state then run `git rebase -i master`
+to go back to a previous commit, make some changes, then use `git commit` or `git
+commit --amend` to insert my changes into the history as appropriate. Then I do
+`git rebase --continue` to find and fix any conflicts.
+
+After some time, in my worktree I wind up with a log like
+
+```
+$ git log HEAD --not master --oneline
+5e5238c9 (HEAD -> 2024-08--construct-concrete) policy: implement debug and display for Policy2
+1199d71f policy: introduce Inner type and Policy2 type which uses it
+a32978c1 policy: rename concrete.rs to concrete/mod.rs
+05fb326c policy: clean up compiler feature-gating
+d54ef0b8 f add overflow test case
+5f444f60 key: introduce ErasedKey type
+bff75039 lib.rs: move key traits into dedicated key.rs file
+d76a4b47 plan: remove wildcard import
+```
+
+As you can see, `HEAD` is at the tip of the branch, and there is one `f`ixup commit which
+is probably one that I'm actively working on. To continue work on this branch, I would
+use `rebase -i` and `edit` that commit.
+
+This works pretty well, but there are a ton of annoying problems:
+
+1. If you get overwhelmed by conflicts, you may need to bail out with `git rebase --abort`,
+   losing your work. It helps to write down your commit IDs as you're working, because the
+   reflog gets pretty hard to follow during rebases, so you can pick out your old changes.
+   Or you can use `git rebase --skip` and then later cherry-pick the skipped commit. Either
+   way, it's a lot of manual work.
+2. Because it's so easy to get overwhelmed, you get into a habit of doing tiny rebases:
+   use `rebase -i` to change a few lines, resolve all the conflicts, then repeat to change
+   the next few lines, turning a single conceptual change into several minutes of running
+   git commands and tracking your repo state instead of your code.
+3. If you step away while doing this, there's nothing in the state of your repo that really
+   shows what you were doing. I often wind up adding comments into the source code itself
+   along the lines of "before you went to bed, you were intending to modify commit X to do
+   Y". This creates a lot of friction in day-to-day work, and several times a year I'll
+   have to throw away lots of work because I left a worktree too long mid-rebase and lost
+   track of what I was doing.
+4. If you forget that you're mid-rebase and just add extra commits and so on, you'll be in
+   a detached HEAD state and be surprised when `git push` doesn't update any remote refs.
+   It can also be hard to get out of this state -- it's often easiest to write down your
+   commit IDs, `git rebase --abort` your branch to an old state, then use `cherry-pick`
+   and `diff` to replay your changes.
+5. You will also find yourself using `git reset` to move refs around a lot because you spend
+   so much time doing manual tree surgery. And then git will whine constantly about e.g.
+   refusing to check out the same ref in two worktrees. For a tool so insistent on always
+   having a checked-out ref, it sure has a lot of pointless rules about it.
+
+Also, if you have git set to auto-sign commits and your gpg agent doesn't work for whatever
+reason, `git rebase` gets into a confusing state and you have to think very carefully about
+whether to use `commit`, `commit --amend` or `rebase --continue` to fix it. Probably it's
+easiest to just `rebase --abort`, unlock the gpg agent, and redo whatever you were doing.
+
+There is also a long tail of papercuts in the UX: needing to do `git commit` after fixing
+conflicts but needing to do `git commit --amend` after fixing test failures (and needing
+to `rebase --abort` and restart after getting this wrong); the fact that `rebase -i master`
+actually rebases on `master` when really I just wanted to replay commits, but
+`rebase -i $(git merge-base HEAD master)` is annoying to type; the confusing labels on
+conflict markers; the lack of direct syntax for "add a new commit here" in `rebase -i`;
+the fact that rebasing across merges will do something but that something is "create a
+trainwreck of broken commits for no reason that you have to `reset --hard` away"; and of
+course the usual UX problems where every piece of git functionality is accessed by an
+inane and inconsistently named flag given to ether `commit` or `reset`.
+
+In summary, git makes it possible to construct structured series of commits, in whatever
+order makes sense, but requires a *lot* of babysitting and manual accounting when doing so.
+When doing large changes that span multiple consecutive PRs, there is even more accounting
+to keep them all constantly rebased on each other.
+
+# The same workflow, in jujutsu
+
+In jujutsu, we can start working the same way:
+
+```
+jj workspace add ../2025-05--
+cd ../2025-05--new-feature
+# jj new, make changes, repeat
+```
+
+Now, let's look at the state of my branch:
+
+```
+22:11:02 apoelstra@idrix ~/code/rust-bitcoin/miniscript/2024-08--validation-params% jj log -r '@:: | (::@ & ~::master)' --no-pager
+○  syryxtlk git@wpsoftware.net 2025-05-12 22:11:00 1909b7af good
+│  f move max things into validation
+○  mmopqnpy git@wpsoftware.net 2025-05-12 22:11:00 afa5a612 good
+│  miniscript: rename and cleanup decode::KeyParseError
+...
+[22 commits elided for the blog post]
+...
+○  yymxskuy git@wpsoftware.net 2025-05-12 22:10:57 3538f45c good
+│  miniscript: remove Ctx::check_witness
+@  nzoompqt git@wpsoftware.net 2025-05-12 22:10:51 "2024-08--validation-params"@ 758b2993 good
+│  f or_d dissat data loses +1 on exec_stack_count, i think this was wrong
+○  sumtlsqm git@wpsoftware.net 2025-05-11 18:28:47 a1f4bd09 good
+│  compiler: forbid fragment probabilities of 0
+○  qzrzyxup git@wpsoftware.net 2025-05-11 18:28:04 fed7818f good
+│  compiler: revert malleability check to simpler version
+○  klmvpnsr git@wpsoftware.net 2025-05-11 13:38:15 9d0b7b95 good
+│  miniscript: remove MalleablePkH script context rule
+~
+```
+
+Wow, what's going on here? First, the syntax `-r @:: | (::@ & ~::master)` reads
+as "the descendants of the current commit OR (the ancestors of the current commit
+AND non-ancestors of `master`)" and essentially means "show me all the commits
+on this branch".
+
+Secondly, we notice that only one commit has a name and it's not the tip. In general
+`jj` doesn't care to name refs, except when choosing things to push or fetch. You
+can move these names, called `bookmarks`, around independently of what you're working
+on.
+
+Thirdly, we see that one commit has an `@` sign. This is the currently checked-out
+commit and it is *not* the tip.
+
+Fourthly, we see that our IDs are weird strings like `klmvpnsr`. These are "change IDs"
+and they are persistent across rebases, amends, etc. The actual git commit ID for each
+change appears near the end of each line and is not foregrounded, and is likely to
+change very frequently during active work.
+
+If I want to add new commits anywhere in this tree, this is easy: `jj new -A <change ID>`
+creates a new commit after `<change ID>` and `jj new -B <change ID>` creates a new commit
+before. If I specify multiple `-A`s it'll make a merge commit. The new commit will have
+no diff and no description initially.
+
+I can add a diff by just editing files, and add a description with `jj describe`. The
+latter is nice because it means that for commits I'm actively working on, I tag it by
+starting its description with `f` for fixup and fill the rest of the message with
+whatever notes are on my mind about what needs to be done with it. (Obviously I can do
+this in git with `commit --amend` or `reword` in `rebase -i`, but it feels much more
+natural with `jj`)
+
+# Dealing With Conflicts
+
+Next, so let's try editing the `@` commit in a way that conflicts with later commits,
+and see what happens. We open a file that's changed later and tack `xyz` onto the end
+of a line that gets changed. Then:
+
+(By the way, in the actual `jj log` output this is all colorized to be much easier to read.)
+
+```
+jj log -r '@:: | (::@ & ~::master)' --no-pager
+Rebased 25 descendant commits onto updated working copy
+×  syryxtlk git@wpsoftware.net 2025-05-12 22:21:35 59368d00 conflict good
+│  f move max things into validation
+×  mmopqnpy git@wpsoftware.net 2025-05-12 22:21:35 ceb54c2c conflict good
+│  miniscript: rename and cleanup decode::KeyParseError
+...
+[22 commits elided for the blog post]
+...
+○  yymxskuy git@wpsoftware.net 2025-05-12 22:21:32 e4aad013 good
+│  miniscript: remove Ctx::check_witness
+@  nzoompqt git@wpsoftware.net 2025-05-12 22:21:31 "2024-08--validation-params"@ 8d08a8df good
+│  f or_d dissat data loses +1 on exec_stack_count, i think this was wrong
+○  sumtlsqm git@wpsoftware.net 2025-05-11 18:28:47 a1f4bd09 good
+│  compiler: forbid fragment probabilities of 0
+○  qzrzyxup git@wpsoftware.net 2025-05-11 18:28:04 fed7818f good
+│  compiler: revert malleability check to simpler version
+○  klmvpnsr git@wpsoftware.net 2025-05-11 13:38:15 9d0b7b95 good
+│  miniscript: remove MalleablePkH script context rule
+~
+```
+
+Very interesting. We see that many commits now have `x`s besid them and the word
+`conflict`. The git commit IDs of `@` and every later commit have changed, while
+their change IDs have not. Finally, at the top of the output we see the line
+"Rebased 25 descendant commits onto updated working copy".
+
+Now, if I want to see what one of these conflicts looks like, I just run `jj show`
+on one of the conflicted commits:
+
+```
+$ jj show yzyoyllt
+Commit ID: 47968f6665779086c09e181c25ae98947ffa09f2
+Change ID: yzyoylltmnssukrlmxqwnswpqkwttxrx
+Author   : Andrew Poelstra <git@wpsoftware.net> (2025-05-11 00:27:46)
+Committer: Andrew Poelstra <git@wpsoftware.net> (2025-05-12 22:26:35)
+Signature: good signature by Andrew Poelstra (andytoshi) <andytoshi@bitcoin.ninja> C588D63CE41B97C1
+
+    descriptor: call validate in all constructors
+
+    This commit might be a bit annoying to review -- it claims to update all
+    [snip]
+
+diff --git a/src/descriptor/mod.rs b/src/descriptor/mod.rs
+index 24d7c8410e..0000000000 100644
+--- a/src/descriptor/mod.rs
++++ b/src/descriptor/mod.rs
+@@ -23,7 +23,13 @@
+
+ use crate::expression::FromTree as _;
+ use crate::miniscript::decode::Terminal;
+-use crate::miniscript::{satisfy, Legacy, Miniscript, Segwitv0};xyz
++<<<<<<< Conflict 1 of 1
++%%%%%%% Changes from base to side #1
++-use crate::miniscript::{satisfy, Legacy, Miniscript, Segwitv0};
+++use crate::miniscript::{satisfy, Legacy, Miniscript, Segwitv0};xyz
+++++++++ Contents of side #2
++use crate::miniscript::{satisfy, Legacy, Miniscript, Segwitv0, ValidationParams};
++>>>>>>> Conflict 1 of 1 ends
+ use crate::plan::{AssetProvider, Plan};
+ use crate::prelude::*;
+ use crate::{
+ ```
+
+We can see that the conflicting file has some conflict markers, which look slightly different
+from git's. These conflict markers aren't actually part of the file's contents; jj stores it
+somehow in a way that allows conflicts to cascade through multiple commits without causing
+chaotic nested conflicts.
+
+If I want to fix the commit, I can do so directly by checking out the offending commit
+with `jj edit yzyo` and just fixing the file; no need to `git add` or `git commit`. Or
+I can add a new commit after it with `jj new -A yzyo`, fix the conflict there, and
+`jj squash` once I'm happy.
+
+Importantly, I don't need to fix these conflicts until I have time to do so. And if I have
+a commit where, after doing a bunch of post-hoc prepatory work, the commit has become an
+increasingly large mess of conflicts, I can just drop it with `jj abandon` -- but I don't
+need to do this until I'm sure I've extracted all the information I need from it.
+
+# Missing Features
+
+There are a bunch of missing features in `jj` which make me miss `git`, and switch back to `git`
+pretty frequently. The biggest one is that there is no `jj grep`. There are also a ton of tools
+(git-annex, aider-chat, my own shellscripts) which assume a git repo and choke when they can't
+find one. It seems like `jj show` doesn't accept filename patterns to filter by, which is one
+reason that I prefer using git for reviews.
+
+`jj show` does not show `git-notes`, which means that I cannot see my annotations labelling
+commits with the Github PRs they currently appear in. Maybe there is a more jj-natural way to
+do this, but I don't know it.
+
+I wouldn't mind migrating my own scripts, but there's lots of stuff like `git rev-parse --show-toplevel`
+where it would take a bunch of digging to find the `jj` equivalent.
+
+But the story is good enough that for active development work, I use `jj` full-time, and writing
+code is more fun and lower friction.
+
+
