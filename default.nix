@@ -23,6 +23,8 @@ pkgs.stdenv.mkDerivation {
     # Use the Iris theme downloaded via fetchFromGitHub
     mkdir -p iris
     cp -r ${irisTheme}/* iris/
+    chmod +w -R iris/
+    find iris -type f -name '*.html' -exec sed -i 's/http:/https:/g' {} \;
     
     # Generate the site with Pelican
     ${pkgs.python3Packages.pelican}/bin/pelican content -o $out -s pelicanconf.py

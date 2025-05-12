@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Colors for messages
 GREEN='\033[0;32m'
@@ -20,7 +20,7 @@ while IFS= read -r file; do
         echo -e "${YELLOW}Adding ${file} to unstamped files list${NC}"
         unstamped_files+=("${file}")
     fi
-done < <(find content/ -type f -not -name "*.ots" -not -path "*/\.*" -not -path "*/images/*")
+done < <(find content/ -type f -not -name "*.ots" -not -path "*/\.*")
 
 # Stamp all unstamped files
 if [ ${#unstamped_files[@]} -gt 0 ]; then

@@ -1,7 +1,7 @@
 # Pelican configuration file
 
 AUTHOR = 'Andrew Poelstra'
-SITENAME = 'Andrew\'s Blog'
+SITENAME = 'so some railing sail assails'
 SITEURL = 'https://wpsoftware.net/andrew/blog'
 
 PATH = 'content'
