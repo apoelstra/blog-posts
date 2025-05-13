@@ -14,8 +14,26 @@ unstamped_files=()
 
 while IFS= read -r file; do
     if [ -f "${file}.ots" ]; then
-        echo -e "${GREEN}Upgrading ${file}.ots${NC}"
-        ots upgrade "${file}.ots" || echo -e "${RED}Upgrade failed for ${file}.ots${NC}"
+        # Check if file has changed since OTS was created
+        ots_timestamp=$(git log -1 --format=%at -- "${file}.ots")
+        file_timestamp=$(git log -1 --format=%at -- "${file}")
+        
+        if [[ $file_timestamp -gt $ots_timestamp ]]; then
+            echo -e "${YELLOW}File ${file} has changed since OTS was created, re-stamping...${NC}"
+            rm "${file}.ots"
+            unstamped_files+=("${file}")
+        else
+            echo -e "${GREEN}Upgrading ${file}.ots${NC}"
+            if ! ots upgrade "${file}.ots"; then
+                echo -e "${RED}Upgrade failed for ${file}.ots${NC}"
+                # Check if failure is due to file content change
+                if ots verify "${file}.ots" 2>&1 | grep -q "File content does not match"; then
+                    echo -e "${YELLOW}File content changed, re-stamping ${file}...${NC}"
+                    rm "${file}.ots"
+                    unstamped_files+=("${file}")
+                fi
+            fi
+        fi
     else
         echo -e "${YELLOW}Adding ${file} to unstamped files list${NC}"
         unstamped_files+=("${file}")
